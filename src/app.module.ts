@@ -3,6 +3,7 @@ import { UsersModule } from './users/users.module';
 import { CommonsModule } from './commons/commons.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { ResendModule } from 'nestjs-resend';
 
 @Module({
   imports: [
@@ -20,6 +21,9 @@ import { ConfigModule } from '@nestjs/config';
     }),
     UsersModule,
     CommonsModule,
+    ResendModule.forRoot({
+      apiKey: process.env.RESEND_API!,
+    }),
   ],
   controllers: [],
   providers: [],
