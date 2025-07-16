@@ -8,7 +8,7 @@ export class TwoFactorToken extends CoreEntity {
     @IsString()
     @IsUUID()
     @Column()
-    token: string;
+    code: string;
 
     @IsUUID()
     @Column()

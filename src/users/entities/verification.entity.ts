@@ -8,7 +8,7 @@ export class Verification extends CoreEntity {
     @IsString()
     @IsNotEmpty()
     @Column()
-    code: string;
+    token: string;
 
     @IsString()
     @IsNotEmpty()

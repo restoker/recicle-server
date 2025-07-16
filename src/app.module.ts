@@ -4,6 +4,8 @@ import { CommonsModule } from './commons/commons.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ResendModule } from 'nestjs-resend';
+import { RolesModule } from './roles/roles.module';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { ResendModule } from 'nestjs-resend';
     ResendModule.forRoot({
       apiKey: process.env.RESEND_API!,
     }),
+    RolesModule,
+    JwtModule,
   ],
   controllers: [],
   providers: [],
