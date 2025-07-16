@@ -1,7 +1,8 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from "class-validator";
 import { CoreEntity } from "src/commons/entities/core.entity";
-import { Column } from "typeorm";
+import { Column, Entity } from "typeorm";
 
+@Entity()
 export class User extends CoreEntity {
     @IsNotEmpty()
     @IsString()
