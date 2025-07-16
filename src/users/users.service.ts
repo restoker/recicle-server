@@ -1,22 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput, CreateUserOutput } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Verification } from './entities/verification.entity';
 import { DataSource, Repository } from 'typeorm';
+import { CreateUserInput, CreateUserOutput } from './dto/create-user.dto';
+import { UserProfileInput, UserProfileOutput } from './dto/user-profile.dto';
 import { ResendService } from 'nestjs-resend';
+import { Verification } from './entities/verification.entity';
+import { JwtService } from 'src/jwt/jwt.service';
 import { Rol } from 'src/roles/entities/role.entity';
 import { GetUsersOutput } from './dto/get-users.dto';
 import { LoginInput, LoginOutput } from './dto/login-user.dto';
-import { UserProfileInput, UserProfileOutput } from './dto/user-profile.dto';
-import { JwtService } from 'src/jwt/jwt.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
     @InjectRepository(Verification)
     private readonly verificationRepository: Repository<Verification>,
     @InjectRepository(Rol)

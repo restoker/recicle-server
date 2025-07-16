@@ -23,11 +23,13 @@ import { JwtModule } from './jwt/jwt.module';
     }),
     UsersModule,
     CommonsModule,
+    JwtModule.forRoot({
+      privateKey: process.env.PRIVATE_KEY!,
+    }),
     ResendModule.forRoot({
       apiKey: process.env.RESEND_API!,
     }),
     RolesModule,
-    JwtModule,
   ],
   controllers: [],
   providers: [],
