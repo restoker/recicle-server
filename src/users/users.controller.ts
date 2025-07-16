@@ -18,13 +18,13 @@ export class UsersController {
     return this.usersService.create(input);
   }
 
-  // @Post('/login')
-  // async loginUser(
-  //   @Body()
-  //   input: LoginInput
-  // ): Promise<LoginOutput> {
-  //   return this.usersService.login(input);
-  // }
+  @Post('/login')
+  async loginUser(
+    @Body()
+    input: LoginInput
+  ): Promise<LoginOutput> {
+    return this.usersService.login(input);
+  }
 
   @Post('/verification')
   async verificarEmail(

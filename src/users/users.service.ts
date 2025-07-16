@@ -34,12 +34,13 @@ export class UsersService {
       if (existe) {
         if (!existe.verified) {
           const verificationEmail = await this.generateEmailVerificationToken(input.email);
-          const confirmLink = `${process.env.MY_URL}/users/verification?token=${verificationEmail?.token}`;
+          if (!verificationEmail) return { ok: false, msg: 'Error al generar el token de verificación' };
+          const confirmLink = `${process.env.MY_URL}/users/verification?token=${verificationEmail.token}`;
           await this.resendService.send({
-            from: 'indrive <onboarding@resend.dev>',
+            from: 'Recicle <onboarding@resend.dev>',
             to: input.email,
-            subject: 'wellcome to indrive',
-            html: `<p>click here <a href='${confirmLink}'>Confirm your account here</a></p>`
+            subject: 'wellcome to Recicle :D',
+            html: `<p>Has click Aquí <a href='${confirmLink}'> para confirmar tu cuenta</a></p>`
           });
           return { ok: false, msg: 'Se volvío a enviar un email con el link de activacion a tu correo' };
         }
