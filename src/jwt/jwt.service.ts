@@ -21,7 +21,9 @@ export class JwtService {
 
     verify(token: string) {
         try {
-            return jwt.verify(token, this.options.privateKey);
+            const decoded = jwt.verify(token, this.options.privateKey);
+            console.log(decoded);
+            return decoded;
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {
                 return false;

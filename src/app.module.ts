@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ResendModule } from 'nestjs-resend';
 import { RolesModule } from './roles/roles.module';
 import { JwtModule } from './jwt/jwt.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { JwtModule } from './jwt/jwt.module';
       apiKey: process.env.RESEND_API!,
     }),
     RolesModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
