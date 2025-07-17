@@ -19,10 +19,10 @@ export class User extends CoreEntity {
     @Column()
     nombre: string;
 
+    @IsEmail()
     @IsNotEmpty()
     @IsString()
-    @IsEmail()
-    @Column('varchar', { unique: true })
+    @Column({ unique: true })
     email: string;
 
     @IsNotEmpty()
@@ -34,7 +34,7 @@ export class User extends CoreEntity {
     @IsOptional()
     @IsString()
     @Column({ nullable: true })
-    imagen?: string;
+    image?: string;
 
     @IsNotEmpty()
     @Length(4, 20)

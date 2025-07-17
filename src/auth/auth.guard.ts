@@ -21,7 +21,6 @@ export class AuthGuard implements CanActivate {
   // }
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const roles = this.reflector.get<AllowedRoles[]>('roles', ctx.getHandler());
-    // console.log(roles);
     if (!roles) return true;
     try {
       // const gqlContext = GqlExecutionContext.create(context).getContext();

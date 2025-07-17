@@ -136,9 +136,10 @@ export class UsersService {
   }
 
   async login(input: LoginInput): Promise<LoginOutput> {
+    const { email, password } = input;
     try {
       const existe = await this.userRepository.findOne({
-        where: { email: input.email },
+        where: { email: email.trim().toLowerCase() },
         relations: ['roles'],
       });
       if (!existe) return { ok: false, msg: 'Usuario o Password incorrectos' };
@@ -151,7 +152,8 @@ export class UsersService {
       existe.password = '';
       return { ok: true, msg: `Hola ${existe.nombre}, Bienvenido nuevamente`, token, user: existe };
     } catch (e) {
-      return { ok: false, msg: 'Error on server', error: 'Error en el servidor' };
+      console.log(e);
+      return { ok: false, msg: 'Error al iniciar sesion', error: 'Error en el servidor' };
     }
   }
 

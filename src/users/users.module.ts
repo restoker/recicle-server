@@ -6,9 +6,10 @@ import { User } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { TwoFactorToken } from './entities/twoFactorToken.entity';
 import { Rol } from 'src/roles/entities/role.entity';
+import { PasswordResetToken } from './entities/passwordResetToken.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Verification, TwoFactorToken, Rol])],
+  imports: [TypeOrmModule.forFeature([User, Verification, TwoFactorToken, Rol, PasswordResetToken])],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService]
