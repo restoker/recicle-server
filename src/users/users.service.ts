@@ -10,6 +10,8 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { Rol } from 'src/roles/entities/role.entity';
 import { GetUsersOutput } from './dto/get-users.dto';
 import { LoginInput, LoginOutput } from './dto/login-user.dto';
+import crypto from 'crypto';
+import { TwoFactorToken } from './entities/twoFactorToken.entity';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +22,8 @@ export class UsersService {
     private readonly verificationRepository: Repository<Verification>,
     @InjectRepository(Rol)
     private readonly rolRepository: Repository<Rol>,
+    @InjectRepository(TwoFactorToken)
+    private readonly twoFactorTokenRepository: Repository<TwoFactorToken>,
     private readonly resendService: ResendService,
     private readonly dataSource: DataSource,
     private readonly jwtServices: JwtService,
@@ -136,24 +140,86 @@ export class UsersService {
   }
 
   async login(input: LoginInput): Promise<LoginOutput> {
-    const { email, password } = input;
     try {
       const existe = await this.userRepository.findOne({
-        where: { email: email.trim().toLowerCase() },
+        where: { email: input.email.trim().toLowerCase() },
         relations: ['roles'],
       });
       if (!existe) return { ok: false, msg: 'Usuario o Password incorrectos' };
       // verificar el password
       // console.log(existe);
+      if (!existe.verified) {
+        // reenviar el correo de verificacion
+        const verificationEmail = await this.generateEmailVerificationToken(existe.email);
+        if (!verificationEmail) return { ok: false, msg: 'Error al generar el token de verificación' };
+        await this.sendVerificationEmail(existe.email);
+        return { ok: false, msg: 'Su usuario no esta verificado, se volvío a enviar un correo de verificación' };
+      }
+
+      if (existe.two_factor_enabled) {
+        if (input.code) {
+          const twoFactor = await this.generateTwoFactorToken(existe.email, existe.id);
+          if (!twoFactor) return { ok: false, msg: 'Error al generar el token de inicio de sesión' };
+          if (twoFactor.token !== input.code) return { ok: false, msg: 'Código incorrecto' };
+          const hasExpired = new Date(twoFactor.expires) < new Date();
+          if (hasExpired) return { ok: false, msg: 'El token ha expirado' };
+          await this.twoFactorTokenRepository.delete({ email: existe.email });
+          const payload = { id: existe.id, nombre: existe.nombre };
+          const token = this.jwtServices.sign(payload);
+          return { ok: true, msg: 'Inicio de sesión exitoso', user: existe, token };
+        } else {
+          const code = await this.generateTwoFactorToken(existe.email, existe.id);
+          if (!code) return { ok: false, msg: 'Error al generar el token de inicio de sesión' };
+          const twoFactor = await this.sendTwoFactorTokenByEmail(existe.email, code.token);
+          if (!twoFactor) return { ok: false, msg: 'Error al enviar el codigo de inicio de sesión' };
+          return { ok: false, msg: 'Su usuario no esta verificado, se volvío a enviar un codigo de inicio de sesión' };
+        }
+      }
+
       const password = await existe.checkPassword(input.password);
       if (!password) return { ok: false, msg: 'Usuario o password incorrectos' };
       const payload = { id: existe.id, nombre: existe.nombre };
       const token = this.jwtServices.sign(payload);
-      existe.password = '';
+      // existe.password = '';
       return { ok: true, msg: `Hola ${existe.nombre}, Bienvenido nuevamente`, token, user: existe };
     } catch (e) {
       console.log(e);
       return { ok: false, msg: 'Error al iniciar sesion', error: 'Error en el servidor' };
+    }
+  }
+
+  async sendTwoFactorTokenByEmail(
+    email: string,
+    token: string
+  ) {
+    const { data, error } = await this.resendService.send({
+      from: "Recicle@resend.dev",
+      to: email,
+      subject: "Recicle - 2 Factor Token",
+      html: `<p>Tu Codigo de inicio de sesion es: ${token}</p>`,
+    })
+    if (error) {
+      console.log(error);
+      return { ok: false, msg: 'Error al enviar el correo de verificación' };
+    };
+    if (data) return data;
+  }
+
+  async sendVerificationEmail(email: string) {
+    try {
+      const verificationEmail = await this.generateEmailVerificationToken(email);
+      if (!verificationEmail) return { ok: false, msg: 'Error al generar el token de verificación' };
+      const confirmLink = `${process.env.MY_URL}/users/verification?token=${verificationEmail.token}`;
+      await this.resendService.send({
+        from: 'indrive <onboarding@resend.dev>',
+        to: email,
+        subject: 'wellcome to indrive',
+        html: `<p>click here <a href='${confirmLink}'>Confirm your account here</a></p>`
+      });
+      return { ok: true, msg: 'Se envio un Link de verificación a su correo' };
+    } catch (e) {
+      console.log(e);
+      return { ok: false, msg: 'Error al enviar el correo de verificación' };
     }
   }
 
@@ -209,7 +275,40 @@ export class UsersService {
       })
       return { ok: true, msg: 'Su correo fue validado' };
     } catch (e) {
-      return { ok: false, msg: 'Error en el servidor, intentolo mas tarde' };
+      return { ok: false, msg: 'Error en el servidor, intentelo mas tarde' };
+    }
+  }
+
+  async generateTwoFactorToken(email: string, userId: string) {
+    try {
+      const token = crypto.randomInt(100_000, 1_000_000).toString();
+      //Hour Expiry
+      const expires = new Date(new Date().getTime() + 3600 * 1000);
+
+      const existingToken = await this.getTwoFactorTokenByEmail(email);
+
+      if (existingToken) {
+        await this.twoFactorTokenRepository.delete({ id: existingToken.id });
+      }
+      const twoFactorToken = this.twoFactorTokenRepository.create({
+        email,
+        token,
+        expires,
+        userId,
+      })
+      await this.twoFactorTokenRepository.save(twoFactorToken);
+      return twoFactorToken
+    } catch (e) {
+      return null
+    }
+  }
+
+  async getTwoFactorTokenByEmail(email: string) {
+    try {
+      const twoFactorToken = await this.twoFactorTokenRepository.findOneBy({ email });
+      return twoFactorToken;
+    } catch (error) {
+      return null;
     }
   }
 }
