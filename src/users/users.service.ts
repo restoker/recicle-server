@@ -39,7 +39,7 @@ export class UsersService {
         if (!existe.verified) {
           const verificationEmail = await this.generateEmailVerificationToken(input.email);
           if (!verificationEmail) return { ok: false, msg: 'Error al generar el token de verificación' };
-          const confirmLink = `${process.env.MY_URL}/users/verification?token=${verificationEmail.token}`;
+          const confirmLink = `${process.env.MY_URL}/verify?token=${verificationEmail.token}`;
           await this.resendService.send({
             from: 'Recicle <onboarding@resend.dev>',
             to: input.email,
@@ -196,8 +196,8 @@ export class UsersService {
       from: "Recicle@resend.dev",
       to: email,
       subject: "Recicle - 2 Factor Token",
-      html: `<p>Tu Codigo de inicio de sesion es: ${token}</p>`,
-    })
+      html: `<p>Tu Código de inicio de sesión es: ${token}</p>`,
+    });
     if (error) {
       console.log(error);
       return { ok: false, msg: 'Error al enviar el correo de verificación' };
@@ -209,12 +209,12 @@ export class UsersService {
     try {
       const verificationEmail = await this.generateEmailVerificationToken(email);
       if (!verificationEmail) return { ok: false, msg: 'Error al generar el token de verificación' };
-      const confirmLink = `${process.env.MY_URL}/users/verification?token=${verificationEmail.token}`;
+      const confirmLink = `${process.env.MY_URL}/verify?token=${verificationEmail.token}`;
       await this.resendService.send({
-        from: 'indrive <onboarding@resend.dev>',
+        from: 'Recicle <onboarding@resend.dev>',
         to: email,
-        subject: 'wellcome to indrive',
-        html: `<p>click here <a href='${confirmLink}'>Confirm your account here</a></p>`
+        subject: 'wellcome to Recicle :D',
+        html: `<p>click aqui <a href='${confirmLink}'>Para confirmar tu cuenta</a></p>`
       });
       return { ok: true, msg: 'Se envio un Link de verificación a su correo' };
     } catch (e) {
