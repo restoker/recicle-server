@@ -18,6 +18,7 @@ async function bootstrap() {
           )).toString(),
         });
       },
+      stopAtFirstError: true,
     })
   )
   app.enableCors()
