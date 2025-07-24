@@ -12,6 +12,8 @@ import { GetUsersOutput } from './dto/get-users.dto';
 import { LoginInput, LoginOutput } from './dto/login-user.dto';
 import crypto from 'crypto';
 import { TwoFactorToken } from './entities/twoFactorToken.entity';
+import { UpdateUserInput, UpdateUserOutput } from './dto/update-user.dto';
+import { FilesService } from 'src/files/files.service';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +29,7 @@ export class UsersService {
     private readonly resendService: ResendService,
     private readonly dataSource: DataSource,
     private readonly jwtServices: JwtService,
-    // private readonly filesServices: FilesService,
+    private readonly filesServices: FilesService,
   ) { }
 
   async create(input: CreateUserInput): Promise<CreateUserOutput> {
@@ -309,6 +311,37 @@ export class UsersService {
       return twoFactorToken;
     } catch (error) {
       return null;
+    }
+  }
+
+  async updateWithImage(id: string, input: UpdateUserInput, file?: Express.Multer.File): Promise<UpdateUserOutput> {
+    // if (input.id) {
+    //   delete input.id;
+    // }
+    try {
+      // verificar si el usuario existe
+      const existe = await this.userRepository.findOneBy({ id });
+      // console.log(existe);
+      if (!existe) return { ok: false, msg: `El usuario con el ${id} no existe` };
+      let imagenUrl = '';
+      if (file) {
+        const { ok, url, msg } = await this.filesServices.uploadFile(file, 'avatar');
+        if (!ok) return { ok: false, msg };
+        if (!url) return { ok: false, msg: 'Error al subir la imagen' };
+        imagenUrl = url;
+      }
+      const updatedUser = Object.assign(existe, input);
+      // console.log(updatedUser);
+      const [user] = await this.userRepository.save([
+        {
+          ...updatedUser,
+          ...(imagenUrl && { image: imagenUrl }),
+        }
+      ]);
+      user.password = '';
+      return { ok: true, msg: 'Usuario actualizado', user: user };
+    } catch (e) {
+      return { ok: false, msg: 'Error en el servidor' };
     }
   }
 }

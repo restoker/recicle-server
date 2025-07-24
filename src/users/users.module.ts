@@ -7,9 +7,10 @@ import { Verification } from './entities/verification.entity';
 import { TwoFactorToken } from './entities/twoFactorToken.entity';
 import { Rol } from 'src/roles/entities/role.entity';
 import { PasswordResetToken } from './entities/passwordResetToken.entity';
+import { FilesModule } from 'src/files/files.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Verification, TwoFactorToken, Rol, PasswordResetToken])],
+  imports: [TypeOrmModule.forFeature([User, Verification, TwoFactorToken, Rol, PasswordResetToken]), FilesModule],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService]

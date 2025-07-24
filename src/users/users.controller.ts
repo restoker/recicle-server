@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, ParseUUIDPipe, Param, Put, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserInput, CreateUserOutput } from './dto/create-user.dto';
 import { LoginInput, LoginOutput } from './dto/login-user.dto';
 import { ConfirmarEmailOutput } from './dto/confirmar-email.dto';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { User } from './entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateUserInput, UpdateUserOutput } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -35,4 +39,36 @@ export class UsersController {
     // return this.usersService.login(input);
     return this.usersService.confirmEmailWithToken(token);
   }
+
+  @Get(":userId")
+  async me(
+    @AuthUser()
+    user: User,
+    @Param('userId', new ParseUUIDPipe())
+    userId: string,
+  ) {
+    // console.log(id);
+    // console.log(user);
+    return this.usersService.findById({ userId });
+  }
+
+  @Put('update/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() input: UpdateUserInput,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 2 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|gif)' }),
+        ],
+        fileIsRequired: false,
+      }),
+    )
+    file?: Express.Multer.File,
+  ): Promise<UpdateUserOutput> {
+    return this.usersService.updateWithImage(id, input, file);
+  }
+
 }

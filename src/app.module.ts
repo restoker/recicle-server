@@ -7,6 +7,7 @@ import { ResendModule } from 'nestjs-resend';
 import { RolesModule } from './roles/roles.module';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     RolesModule,
     AuthModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
