@@ -6,6 +6,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } fro
 import * as bcrypt from 'bcrypt';
 
 export enum UserRole {
+    superadmin = 'superadmin',
     client = 'client',
     driver = 'driver',
     admin = 'admin',
