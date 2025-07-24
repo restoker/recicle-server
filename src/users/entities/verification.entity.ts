@@ -2,7 +2,7 @@ import { IsDate, IsEmail, IsNotEmpty, IsString } from "class-validator";
 import { Column, Entity } from "typeorm";
 import { CoreEntity } from "src/commons/entities/core.entity";
 
-@Entity('verifications')
+@Entity()
 export class Verification extends CoreEntity {
 
     @IsString()

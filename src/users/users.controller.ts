@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, ParseUUIDPipe, Param, Put, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, ParseUUIDPipe, Param, Put, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserInput, CreateUserOutput } from './dto/create-user.dto';
 import { LoginInput, LoginOutput } from './dto/login-user.dto';
@@ -7,6 +7,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserInput, UpdateUserOutput } from './dto/update-user.dto';
+import { UpdateRolInput, UpdateRolOutput } from './dto/update-rol.dto';
 
 @Controller('users')
 export class UsersController {
@@ -69,6 +70,16 @@ export class UsersController {
     file?: Express.Multer.File,
   ): Promise<UpdateUserOutput> {
     return this.usersService.updateWithImage(id, input, file);
+  }
+
+
+  @Patch('asignrol/:id')
+  updateRol(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body()
+    input: UpdateRolInput,
+  ): Promise<UpdateRolOutput> {
+    return this.usersService.updateRol(input, id);
   }
 
 }

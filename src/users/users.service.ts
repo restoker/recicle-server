@@ -10,10 +10,11 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { Rol } from 'src/roles/entities/role.entity';
 import { GetUsersOutput } from './dto/get-users.dto';
 import { LoginInput, LoginOutput } from './dto/login-user.dto';
-import crypto from 'crypto';
+import * as crypto from 'node:crypto';
 import { TwoFactorToken } from './entities/twoFactorToken.entity';
 import { UpdateUserInput, UpdateUserOutput } from './dto/update-user.dto';
 import { FilesService } from 'src/files/files.service';
+import { UpdateRolInput, UpdateRolOutput } from './dto/update-rol.dto';
 
 @Injectable()
 export class UsersService {
@@ -48,7 +49,7 @@ export class UsersService {
             subject: 'wellcome to Recicle :D',
             html: `<p>Has click Aquí <a href='${confirmLink}'> para confirmar tu cuenta</a></p>`
           });
-          return { ok: false, msg: 'Se volvío a enviar un email con el link de activacion a tu correo' };
+          return { ok: false, msg: 'Se volvío a enviar un email con el link de activación a tu correo' };
         }
         return { ok: false, msg: 'El usuario ya existe' };
       }
@@ -64,9 +65,9 @@ export class UsersService {
         telefono: input.telefono,
       });
 
-      const token = crypto.randomUUID();
+      const token = crypto['randomUUID']();
       const expires = new Date(new Date().getTime() + 3600 * 1000);
-      const confirmLink = `${process.env.MY_URL}/users/verification?token=${token}`;
+      const confirmLink = `${process.env.MY_URL}/verify?token=${token}`;
       // const confirmLink = `${domain}/verification?token=${token}`;
       // console.log(confirmLink);
       const verificationToken = this.verificationRepository.create({
@@ -81,9 +82,9 @@ export class UsersService {
       const p1 = await this.userRepository.save(newUser);
       const p3 = await this.verificationRepository.save(verificationToken);
       const p2 = await this.resendService.send({
-        from: 'indrive <onboarding@resend.dev>',
+        from: 'Recicle <onboarding@resend.dev>',
         to: input.email,
-        subject: 'wellcome to indrive',
+        subject: 'wellcome to Recicle :D',
         html: `<p>click here <a href='${confirmLink}'>Confirm your account here</a></p>`
       });
       // const p4 = await this.rolRepository.create()
@@ -99,7 +100,7 @@ export class UsersService {
       })
       return { ok: true, msg: 'Se envio un Link de verificación a su correo' };
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       return { ok: false, msg: 'Error en el servidor' };
     }
   }
@@ -342,6 +343,38 @@ export class UsersService {
       return { ok: true, msg: 'Usuario actualizado', user: user };
     } catch (e) {
       return { ok: false, msg: 'Error en el servidor' };
+    }
+  }
+
+  async updateRol(input: UpdateRolInput, id: string): Promise<UpdateRolOutput> {
+    try {
+      const existe = await this.userRepository.findOne({
+        where: { id },
+        relations: ['roles'],
+      });
+      if (!existe) return { ok: false, msg: 'El usuario no existe' };
+      for (const rol of existe.roles) {
+        if (rol.name === input.rol.toLocaleLowerCase()) return { ok: false, msg: 'Ya tiene ese rol asignado' };
+      }
+      // search rol
+      const newRol = await this.rolRepository.findBy({ name: input.rol });
+      const rolesOwner = [...existe.roles];
+      existe.roles = [...rolesOwner, ...newRol];
+      // console.log(existe.roles);
+      await this.userRepository.save([
+        {
+          id,
+          roles: existe.roles,
+        }
+      ]);
+
+      return { ok: true, msg: 'Nuevo rol asignado' };
+
+    } catch (e) {
+      return {
+        ok: false,
+        msg: 'Error en el servidor',
+      }
     }
   }
 }
