@@ -271,11 +271,13 @@ export class UsersService {
       const usuario = await this.userRepository.findOneBy({ email: existeToken.email });
       if (!usuario) return { ok: false, msg: 'El usuario no existe' };
       await this.verificationRepository.delete({ email: usuario.email });
-      await this.userRepository.save({
-        id: usuario.id,
-        verificated: true,
-        email: existeToken.email,
-      })
+      await this.userRepository.save([
+        {
+          id: usuario.id,
+          verified: true,
+          email: usuario.email,
+        }
+      ])
       return { ok: true, msg: 'Su correo fue validado' };
     } catch (e) {
       return { ok: false, msg: 'Error en el servidor, intentelo mas tarde' };
