@@ -289,7 +289,7 @@ export class UsersService {
 
   async generateTwoFactorToken(email: string, userId: string) {
     try {
-      const token = crypto.randomInt(100_000, 1_000_000).toString();
+      const token = crypto.randomInt(1_000, 10_000).toString();
       //Hour Expiry
       const expires = new Date(new Date().getTime() + 3600 * 1000);
 
