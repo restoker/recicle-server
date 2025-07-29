@@ -159,13 +159,16 @@ export class UsersService {
         return { ok: false, msg: 'Su usuario no esta verificado, se volvío a enviar un correo de verificación' };
       }
 
-      if (existe.two_factor_enabled) {
+      if (existe.two_factor_enabled && existe.email) {
         if (input.code) {
-          const twoFactor = await this.generateTwoFactorToken(existe.email, existe.id);
-          if (!twoFactor) return { ok: false, msg: 'Error al generar el token de inicio de sesión' };
+          const twoFactor = await this.getTwoFactorTokenByEmail(existe.email);
+          if (!twoFactor) return { ok: false, msg: 'Error al verificar el código de inicio de sesión' };
           if (twoFactor.token !== input.code) return { ok: false, msg: 'Código incorrecto' };
           const hasExpired = new Date(twoFactor.expires) < new Date();
-          if (hasExpired) return { ok: false, msg: 'El token ha expirado' };
+          if (hasExpired) {
+            await this.twoFactorTokenRepository.delete({ email: existe.email });
+            return { ok: false, msg: 'Su código ha expirado' };
+          }
           await this.twoFactorTokenRepository.delete({ email: existe.email });
           const payload = { id: existe.id, nombre: existe.nombre };
           const token = this.jwtServices.sign(payload);
@@ -175,7 +178,7 @@ export class UsersService {
           if (!code) return { ok: false, msg: 'Error al generar el token de inicio de sesión' };
           const twoFactor = await this.sendTwoFactorTokenByEmail(existe.email, code.token);
           if (!twoFactor) return { ok: false, msg: 'Error al enviar el codigo de inicio de sesión' };
-          return { ok: false, msg: 'Su usuario no esta verificado, se volvío a enviar un codigo de inicio de sesión' };
+          return { ok: false, msg: 'Se envio un codigo de inicio de sesión a su correo' };
         }
       }
 
@@ -202,7 +205,7 @@ export class UsersService {
       html: `<p>Tu Código de inicio de sesión es: ${token}</p>`,
     });
     if (error) {
-      console.log(error);
+      // console.log(error);
       return { ok: false, msg: 'Error al enviar el correo de verificación' };
     };
     if (data) return data;
