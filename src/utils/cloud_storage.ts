@@ -7,7 +7,7 @@ const uuid = uuidv4();
 
 
 
-const storageFile = (file, pathImage, carpetaName): Promise<string> => {
+const storageFile = (file: Express.Multer.File, pathImage: string, carpetaName: string): Promise<string> => {
     function getGoogleCredentials() {
         // if (!process.env.FIREBASE_CREDENTIAL_JSON) return;
         const jsonObject = JSON.parse(process.env.FIREBASE_CREDENTIAL_JSON!);
@@ -24,6 +24,7 @@ const storageFile = (file, pathImage, carpetaName): Promise<string> => {
     });
 
     const bucket = storage.bucket("gs://indriveapp-39520.appspot.com/");
+
     return new Promise((resolve, reject) => {
 
         // console.log('delete path', deletePathImage)
@@ -78,4 +79,32 @@ const storageFile = (file, pathImage, carpetaName): Promise<string> => {
     });
 }
 
-export default storageFile;
+const deleteFile = async (pathImage: string) => {
+    function getGoogleCredentials() {
+        // if (!process.env.FIREBASE_CREDENTIAL_JSON) return;
+        const jsonObject = JSON.parse(process.env.FIREBASE_CREDENTIAL_JSON!);
+        return {
+            private_key: jsonObject.private_key,
+            client_email: jsonObject.client_email
+        }
+    }
+
+    const storage = new Storage({
+        projectId: "indriveapp-39520",
+        // keyFilename: process.env.FIREBASE_CREDENTIAL_JSON,
+        credentials: getGoogleCredentials(),
+    });
+
+    const bucket = storage.bucket("gs://indriveapp-39520.appspot.com/");
+    const fileName = pathImage;
+    try {
+        await bucket.file(fileName).delete();
+        return { ok: true, msg: 'Imagen eliminada con exito' }
+    } catch (e) {
+        // console.log(e);
+        return { ok: false, msg: 'Error al eliminar la imagen' }
+    }
+}
+
+
+export default { storageFile, deleteFile };
