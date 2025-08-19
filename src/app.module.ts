@@ -8,6 +8,7 @@ import { RolesModule } from './roles/roles.module';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { FilesModule } from './files/files.module';
     RolesModule,
     AuthModule,
     FilesModule,
+    AddressModule,
   ],
   controllers: [],
   providers: [],
