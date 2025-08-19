@@ -1,22 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { AddressService } from './address.service';
-import { CreateAddressDto } from './dto/create-address.dto';
+import { CreateAddressDtoInput } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { Role } from 'src/auth/role.decorator';
+import { User, UserRole } from 'src/users/entities/user.entity';
+import { GetAllAddressDtoInput } from './dto/get-all-address.dto';
 
 @Controller('address')
 export class AddressController {
-  constructor(private readonly addressService: AddressService) {}
+  constructor(private readonly addressService: AddressService) { }
 
-  @Post()
-  create(@Body() createAddressDto: CreateAddressDto) {
+  @Role([UserRole.client])
+  @Post('/new')
+  create(@Body() createAddressDto: CreateAddressDtoInput) {
     return this.addressService.create(createAddressDto);
   }
 
-  @Get()
-  findAll() {
-    return this.addressService.findAll();
+  @Role([UserRole.client])
+  @Get('/all/:idUser')
+  findAllAdress(
+    @AuthUser() user: User,
+    @Param('idUser', new ParseUUIDPipe()) idUser: string
+  ) {
+    return this.addressService.findAllAddress(idUser, user);
   }
 
+  @Role([UserRole.admin, UserRole.superadmin])
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.addressService.findOne(+id);

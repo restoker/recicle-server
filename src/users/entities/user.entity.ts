@@ -2,8 +2,9 @@ import { InternalServerErrorException } from "@nestjs/common";
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from "class-validator";
 import { CoreEntity } from "src/commons/entities/core.entity";
 import { Rol } from "src/roles/entities/role.entity";
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { Address } from "src/address/entities/address.entity";
 
 export enum UserRole {
     superadmin = 'superadmin',
@@ -105,5 +106,8 @@ export class User extends CoreEntity {
             name: 'id_rol',
         }
     })
-    roles: Rol[]
+    roles: Rol[];
+
+    @OneToMany(() => Address, (address) => address.user, { cascade: true, onDelete: 'CASCADE' })
+    addresses: Address[];
 }

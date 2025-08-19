@@ -8,9 +8,10 @@ import { TwoFactorToken } from './entities/twoFactorToken.entity';
 import { Rol } from 'src/roles/entities/role.entity';
 import { PasswordResetToken } from './entities/passwordResetToken.entity';
 import { FilesModule } from 'src/files/files.module';
+import { Address } from 'src/address/entities/address.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Verification, TwoFactorToken, Rol, PasswordResetToken]), FilesModule],
+  imports: [TypeOrmModule.forFeature([User, Verification, TwoFactorToken, Rol, PasswordResetToken, Address]), FilesModule],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService]

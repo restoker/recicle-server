@@ -4,7 +4,7 @@ import { CreateUserInput, CreateUserOutput } from './dto/create-user.dto';
 import { LoginInput, LoginOutput } from './dto/login-user.dto';
 import { ConfirmarEmailOutput } from './dto/confirmar-email.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserInput, UpdateUserOutput } from './dto/update-user.dto';
 import { UpdateRolInput, UpdateRolOutput } from './dto/update-rol.dto';
