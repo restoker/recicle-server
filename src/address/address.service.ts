@@ -43,7 +43,7 @@ export class AddressService {
           direccion: input.direccion,
           distrito: input.distrito,
           sobrenombre: input.sobrenombre,
-          user: user
+          user: { id: user.id }
         })
         .returning('*')
         .execute();
@@ -53,11 +53,19 @@ export class AddressService {
     }
   }
 
-  async findAllAddress(idUser: string, user: User): Promise<GetAllAddressDtoOutput> {
+  async findAllAddress(idUser: string, user: User) {
     try {
       if (user.id !== idUser) return { ok: false, msg: 'No tienes permiso para esta operación' };
       const addresses = await this.addressRepository.find({ where: { user } });
-      return { ok: true, msg: 'Direcciones obtenidas correctamente', addresses };
+      const direcciones = addresses.map(address => ({
+        id: address.id,
+        direccion: address.direccion,
+        distrito: address.distrito,
+        sobrenombre: address.sobrenombre,
+        lat: address.point.coordinates[0],
+        lng: address.point.coordinates[1],
+      }));
+      return { ok: true, msg: 'Direcciones obtenidas correctamente', addresses: direcciones };
     } catch (error) {
       return { ok: false, msg: 'Error en el servidor' };
     }
