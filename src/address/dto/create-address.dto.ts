@@ -7,7 +7,7 @@ export class CreateAddressDtoInput extends PickType(Address, ['direccion', 'dist
 
     @IsNotEmpty()
     @IsUUID()
-    idUser: string;
+    userId: string;
 
     @IsNotEmpty()
     @IsNumberString()

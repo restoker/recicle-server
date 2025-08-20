@@ -20,11 +20,34 @@ export class AddressService {
   async create(input: CreateAddressDtoInput): Promise<CreateAddressDtoOutput> {
     try {
       // verificar si el usuario existe
-      const user = await this.userRepository.findOneBy({ id: input.idUser });
+      const user = await this.userRepository.findOneBy({ id: input.userId });
       if (!user) return { ok: false, msg: 'El usuario no existe' };
-      const address = this.addressRepository.create(input);
-      const newAddress = await this.addressRepository.save(address);
-      return { ok: true, msg: 'Direccion guardada correctamente', address: newAddress };
+      // const address = await this.addressRepository.query(`
+      //   INSERT INTO 
+      //       address(position, direccion, distrito, sobrenombre, userId)
+      //   VALUES(
+      //       ST_GeomFromText('POINT(${input.lat} ${input.lng})', 4326),
+      //       '${input.direccion}',
+      //       '${input.distrito}',
+      //       '${input.sobrenombre}',
+      //       ${user.id}
+      //   )
+      // `);
+      // create a query builder
+      const query = this.addressRepository.createQueryBuilder();
+      const address = await query
+        .insert()
+        .into(Address)
+        .values({
+          point: () => `ST_GeomFromText('POINT(${input.lat} ${input.lng})', 4326)`,
+          direccion: input.direccion,
+          distrito: input.distrito,
+          sobrenombre: input.sobrenombre,
+          user: user
+        })
+        .returning('*')
+        .execute();
+      return { ok: true, msg: 'Direccion guardada correctamente', address: address.raw[0] };
     } catch (e) {
       return { ok: false, msg: 'Error en el servidor' };
     }
