@@ -1,5 +1,5 @@
 import { InternalServerErrorException } from "@nestjs/common";
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from "class-validator";
+import { IsArray, IsBoolean, IsEmail, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from "class-validator";
 import { CoreEntity } from "src/commons/entities/core.entity";
 import { Rol } from "src/roles/entities/role.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
@@ -108,6 +108,7 @@ export class User extends CoreEntity {
     })
     roles: Rol[];
 
+    @IsArray()
     @OneToMany(() => Address, (address) => address.user, { cascade: true, onDelete: 'CASCADE' })
     addresses: Address[];
 }

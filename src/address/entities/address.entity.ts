@@ -2,7 +2,7 @@ import { IsNotEmpty, MaxLength } from "class-validator";
 import { Point } from "geojson";
 import { CoreEntity } from "src/commons/entities/core.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, RelationId } from "typeorm";
 
 @Entity()
 export class Address extends CoreEntity {
@@ -34,5 +34,8 @@ export class Address extends CoreEntity {
 
     @ManyToOne(() => User, (user) => user.addresses)
     user: User;
+
+    @RelationId((address: Address) => address.user)
+    userId: string;
 
 }
