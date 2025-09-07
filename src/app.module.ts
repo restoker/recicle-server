@@ -14,6 +14,7 @@ import { AddressModule } from './address/address.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, expandVariables: true, envFilePath: '.env', cache: true }),
     TypeOrmModule.forRoot({
+      legacySpatialSupport: false,
       type: 'mysql',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT!,

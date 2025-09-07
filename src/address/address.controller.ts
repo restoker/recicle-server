@@ -5,7 +5,7 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
 import { User, UserRole } from 'src/users/entities/user.entity';
-import { GetAllAddressDtoInput } from './dto/get-all-address.dto';
+// import { GetAllAddressDtoInput } from './dto/get-all-address.dto';
 
 @Controller('address')
 export class AddressController {
@@ -23,7 +23,8 @@ export class AddressController {
     @AuthUser() user: User,
     @Param('idUser', new ParseUUIDPipe()) idUser: string
   ) {
-    return this.addressService.findAllAddress(idUser, user);
+    console.log(user);
+    return this.addressService.findAllAddress(idUser);
   }
 
   @Role([UserRole.admin, UserRole.superadmin])

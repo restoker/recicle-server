@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Address } from './entities/address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { GetAllAddressDtoInput, GetAllAddressDtoOutput } from './dto/get-all-address.dto';
+// import { GetAllAddressDtoInput, GetAllAddressDtoOutput } from './dto/get-all-address.dto';
 
 @Injectable()
 export class AddressService {
@@ -14,7 +14,7 @@ export class AddressService {
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
   ) { }
 
   async create(input: CreateAddressDtoInput): Promise<CreateAddressDtoOutput> {
@@ -53,10 +53,13 @@ export class AddressService {
     }
   }
 
-  async findAllAddress(idUser: string, user: User) {
+  async findAllAddress(idUser: string) {
     try {
-      if (user.id !== idUser) return { ok: false, msg: 'No tienes permiso para esta operación' };
-      const addresses = await this.addressRepository.find({ where: { user } });
+      // if (user.id !== idUser) return { ok: false, msg: 'No tienes permiso para esta operación' };
+      // verificar si el usuario existeç
+      const existe = await this.userRepository.findOneBy({ id: idUser });
+      if (!existe) return { ok: false, msg: 'El usuario no existe' };
+      const addresses = await this.addressRepository.findBy({ user: { id: idUser } });
       const direcciones = addresses.map(address => ({
         id: address.id,
         direccion: address.direccion,
@@ -66,7 +69,8 @@ export class AddressService {
         lng: address.point.coordinates[1],
       }));
       return { ok: true, msg: 'Direcciones obtenidas correctamente', addresses: direcciones };
-    } catch (error) {
+    } catch (e) {
+      // console.log(e);
       return { ok: false, msg: 'Error en el servidor' };
     }
   }
