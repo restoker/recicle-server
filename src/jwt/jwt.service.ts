@@ -22,7 +22,11 @@ export class JwtService {
     verify(token: string) {
         try {
             const decoded = jwt.verify(token, this.options.privateKey);
-            console.log(decoded);
+            // console.log(decoded);
+            // verify if the token is expired
+            // if (decoded.exp < Date.now() / 1000) {
+            //     return false;
+            // }
             return decoded;
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {

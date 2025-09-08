@@ -8,7 +8,11 @@ export class GetAllAddressDtoInput {
     idUser: string;
 }
 
+interface AddressResponse extends Pick<Address, 'id' | 'direccion' | 'distrito' | 'sobrenombre'> {
+    lat: number;
+    lng: number;
+}
 
 export class GetAllAddressDtoOutput extends CoreOutput {
-    addresses?: Address[];
+    addresses?: AddressResponse[];
 }

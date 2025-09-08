@@ -20,10 +20,10 @@ export class AddressController {
   @Role([UserRole.client])
   @Get('/all/:idUser')
   findAllAdress(
-    @AuthUser() user: User,
+    // @AuthUser() user: User,
     @Param('idUser', new ParseUUIDPipe()) idUser: string
   ) {
-    console.log(user);
+    // console.log({ user });
     return this.addressService.findAllAddress(idUser);
   }
 

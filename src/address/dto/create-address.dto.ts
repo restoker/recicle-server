@@ -1,5 +1,5 @@
 import { PickType } from "@nestjs/mapped-types";
-import { IsNotEmpty, IsNumberString, IsUUID } from "class-validator";
+import { IsLatitude, IsLatLong, IsLongitude, IsNotEmpty, IsNumber, IsNumberString, IsUUID } from "class-validator";
 import { Address } from "../entities/address.entity";
 import { CoreOutput } from "src/commons/dtos/core-output.dto";
 
@@ -10,11 +10,15 @@ export class CreateAddressDtoInput extends PickType(Address, ['direccion', 'dist
     userId: string;
 
     @IsNotEmpty()
-    @IsNumberString()
+    // @IsLatLong()
+    @IsNumber()
+    @IsLatitude()
     lat: number;
 
     @IsNotEmpty()
-    @IsNumberString()
+    // @IsLatLong()
+    @IsNumber()
+    @IsLongitude()
     lng: number;
 }
 
