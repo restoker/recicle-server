@@ -9,6 +9,8 @@ import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { AddressModule } from './address/address.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { AddressModule } from './address/address.module';
     AuthModule,
     FilesModule,
     AddressModule,
+    CloudinaryModule,
+    CategoriesModule,
   ],
   controllers: [],
   providers: [],

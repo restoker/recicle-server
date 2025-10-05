@@ -49,16 +49,16 @@ export class AddressService {
         // .returning('*')
         .execute();
       // console.log(address);
-      const direccion = await this.addressRepository.findOneBy({ id: address.identifiers[0].id });
-      if (!direccion) return { ok: false, msg: 'Error al guardar la direccion' };
-      return { ok: true, msg: 'Direccion guardada correctamente', address: direccion };
+      // const direccion = await this.addressRepository.findOneBy({ id: address.identifiers[0].id });
+      // if (!direccion) return { ok: false, msg: 'Error al guardar la direccion' };
+      return { ok: true, msg: 'Direccion creada correctamente' };
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       return { ok: false, msg: 'Error en el servidor' };
     }
   }
 
-  async findAllAddress(idUser: string): Promise<GetAllAddressDtoOutput> {
+  async findAllAddress(idUser: string, userId: string): Promise<GetAllAddressDtoOutput> {
     try {
       // if (user.id !== idUser) return { ok: false, msg: 'No tienes permiso para esta operación' };
       // verificar si el usuario existeç
