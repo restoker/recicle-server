@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsString, MaxLength, MinLength } from "class-validator";
 import { CoreEntity } from "src/commons/entities/core.entity";
-import { Column, Entity } from "typeorm";
+import { Materiales } from "src/materiales/entities/materiale.entity";
+import { Column, Entity, OneToMany } from "typeorm";
 
 @Entity()
 export class Category extends CoreEntity {
@@ -23,4 +24,7 @@ export class Category extends CoreEntity {
     @IsString()
     @Column()
     image: string;
+
+    @OneToMany(() => Materiales, product => product.id)
+    materiales: Materiales[]
 }

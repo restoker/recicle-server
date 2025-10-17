@@ -26,7 +26,7 @@ import { MaterialesModule } from './materiales/materiales.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       autoLoadEntities: true,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      // entities: [__dirname + '/**/*.entity{.ts,.js}'],
       // synchronize: true,
     }),
     UsersModule,
