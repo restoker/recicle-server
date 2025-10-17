@@ -373,7 +373,7 @@ export class UsersService {
         }
       ]);
 
-      return { ok: true, msg: 'Nuevo rol asignado' };
+      return { ok: true, msg: 'Rol asignado' };
 
     } catch (e) {
       return {

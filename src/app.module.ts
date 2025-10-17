@@ -11,6 +11,8 @@ import { FilesModule } from './files/files.module';
 import { AddressModule } from './address/address.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CategoriesModule } from './categories/categories.module';
+import { OrdersModule } from './orders/orders.module';
+import { MaterialesModule } from './materiales/materiales.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { CategoriesModule } from './categories/categories.module';
     AddressModule,
     CloudinaryModule,
     CategoriesModule,
+    OrdersModule,
+    MaterialesModule,
   ],
   controllers: [],
   providers: [],
